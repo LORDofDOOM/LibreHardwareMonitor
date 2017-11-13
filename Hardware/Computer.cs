@@ -94,17 +94,15 @@ namespace OpenHardwareMonitor.Hardware {
         Add(new RAM.RAMGroup(smbios, settings));
 
       if (gpuEnabled) {
-#if !NETSTANDARD2_0
         Add(new ATI.ATIGroup(settings));
-#endif
-                Add(new Nvidia.NvidiaGroup(settings));
+        Add(new Nvidia.NvidiaGroup(settings));
       }
 
       if (fanControllerEnabled) {
 #if !NETSTANDARD2_0
         Add(new TBalancer.TBalancerGroup(settings));
 #endif
-                Add(new Heatmaster.HeatmasterGroup(settings));
+        Add(new Heatmaster.HeatmasterGroup(settings));
       }
 
       if (hddEnabled)
@@ -165,14 +163,10 @@ namespace OpenHardwareMonitor.Hardware {
       set {
         if (open && value != gpuEnabled) {
           if (value) {
-#if !NETSTANDARD2_0
-            Add(newATI.ATIGroup(settings));
-#endif
+            Add(new ATI.ATIGroup(settings));
             Add(new Nvidia.NvidiaGroup(settings));
           } else {
-#if !NETSTANDARD2_0
             RemoveType<ATI.ATIGroup>();
-#endif
             RemoveType<Nvidia.NvidiaGroup>();
           }
         }
