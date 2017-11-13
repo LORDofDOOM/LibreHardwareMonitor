@@ -64,7 +64,8 @@ namespace OpenHardwareMonitor.Hardware {
 
       NativeMethods.CloseServiceHandle(service);
       NativeMethods.CloseServiceHandle(manager);
-      
+
+#if !NETSTANDARD2_0
       try {
         // restrict the driver access to system (SY) and builtin admins (BA)
         // TODO: replace with a call to IoCreateDeviceSecure in the driver
@@ -73,7 +74,8 @@ namespace OpenHardwareMonitor.Hardware {
           "O:BAG:SYD:(A;;FA;;;SY)(A;;FA;;;BA)");
         File.SetAccessControl(@"\\.\" + id, fileSecurity);
       } catch { }
-
+#endif
+      
       errorMessage = null;
       return true;
     }
