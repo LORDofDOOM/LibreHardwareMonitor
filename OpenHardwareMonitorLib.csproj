@@ -13,6 +13,7 @@
     <PackageId>OpenHardwareMonitorLibCore</PackageId>
     <PackageProjectUrl>https://github.com/LORDofDOOM/LibreHardwareMonitor</PackageProjectUrl>
     <RepositoryUrl>https://github.com/LORDofDOOM/LibreHardwareMonitor</RepositoryUrl>
+    <Version>1.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">

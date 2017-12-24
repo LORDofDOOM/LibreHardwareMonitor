@@ -14,7 +14,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("Open Hardware Monitor Library")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("OpenHardwareMonitor port to netcore")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Open Hardware Monitor Library")]
