@@ -11,6 +11,9 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
+#if NETSTANDARD2_0
+using Mono;
+#endif
 
 namespace OpenHardwareMonitor.Hardware {
   internal static class Opcode {
@@ -39,6 +42,19 @@ namespace OpenHardwareMonitor.Hardware {
       size = (ulong)(rdtscCode.Length + cpuidCode.Length);
 
       if ((p == 4) || (p == 128)) { // Unix   
+#if NETSTANDARD2_0
+        Mono.Unix.Native.MmapProts mmapProtsParam =
+          Mono.Unix.Native.MmapProts.PROT_READ |
+          Mono.Unix.Native.MmapProts.PROT_WRITE |
+          Mono.Unix.Native.MmapProts.PROT_EXEC;
+
+        Mono.Unix.Native.MmapFlags mmapFlagsParam = 
+          Mono.Unix.Native.MmapFlags.MAP_ANONYMOUS |
+          Mono.Unix.Native.MmapFlags.MAP_PRIVATE;
+
+        codeBuffer = (IntPtr)Mono.Unix.Native.Syscall.mmap(IntPtr.Zero, 
+          size, mmapProtsParam, mmapFlagsParam, -1, 0);
+#else
         Assembly assembly = 
           Assembly.Load("Mono.Posix, Version=2.0.0.0, Culture=neutral, " +
           "PublicKeyToken=0738eb9f132ed756");
@@ -58,7 +74,8 @@ namespace OpenHardwareMonitor.Hardware {
           (int)mmapFlags.GetField("MAP_PRIVATE").GetValue(null));
         
         codeBuffer = (IntPtr)mmap.Invoke(null, new object[] { IntPtr.Zero, 
-          size, mmapProtsParam, mmapFlagsParam, -1, 0 });        
+          size, mmapProtsParam, mmapFlagsParam, -1, 0 });
+#endif
       } else { // Windows
         codeBuffer = NativeMethods.VirtualAlloc(IntPtr.Zero,
           (UIntPtr)size, AllocationType.COMMIT | AllocationType.RESERVE, 
@@ -83,6 +100,9 @@ namespace OpenHardwareMonitor.Hardware {
       
       int p = (int)Environment.OSVersion.Platform;
       if ((p == 4) || (p == 128)) { // Unix
+#if NETSTANDARD2_0
+        Mono.Unix.Native.Syscall.munmap(codeBuffer, size);
+#else
         Assembly assembly =
           Assembly.Load("Mono.Posix, Version=2.0.0.0, Culture=neutral, " +
           "PublicKeyToken=0738eb9f132ed756");
@@ -90,7 +110,7 @@ namespace OpenHardwareMonitor.Hardware {
         Type syscall = assembly.GetType("Mono.Unix.Native.Syscall");
         MethodInfo munmap = syscall.GetMethod("munmap");
         munmap.Invoke(null, new object[] { codeBuffer, size });
-
+#endif
       } else { // Windows
         NativeMethods.VirtualFree(codeBuffer, UIntPtr.Zero, 
           FreeType.RELEASE);        
